@@ -2,12 +2,15 @@ package org.turkisi.config.client;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.turkisi.config.client.cache.ConfigurationCacheProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,27 +21,35 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author Gökalp Gürbüzer (gokalp.gurbuzer@yandex.com)
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ConfigurationReader {
 
-    private final String serviceName;
-    private final String configurationServiceUrl;
+    private String serviceName;
+    private String configurationServiceUrl;
 
     private AtomicReference<String> cookie = new AtomicReference<>();
     private AtomicBoolean configurationPopulated = new AtomicBoolean(false);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService scheduledExecutorService;
 
-    private HashMap<String, ConfigurationResponseModel> params = new HashMap<>();
+    private ConfigurationCacheProvider cacheProvider;
 
-    public ConfigurationReader(String serviceName, String configurationServiceUrl, int refreshTimeoutMillis) {
+    public ConfigurationReader(ConfigurationCacheProvider cacheProvider) {
 
+        this.cacheProvider = cacheProvider;
+    }
+
+    public ConfigurationReader initialize(String serviceName, String configurationServiceUrl, int refreshTimeoutMillis) {
         this.serviceName = serviceName;
         this.configurationServiceUrl = configurationServiceUrl;
 
         scheduledExecutorService = Executors.newScheduledThreadPool(1, r -> new Thread(r, this.serviceName + "-ConfigReaderScheduler"));
         scheduledExecutorService.scheduleAtFixedRate(this::updateKeys, 0, refreshTimeoutMillis, TimeUnit.MILLISECONDS);
         cookie.set(null);
+
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -59,7 +70,7 @@ public class ConfigurationReader {
             throw new IOException("Wait for configuration population failed, check earlier log messages for details");
         }
 
-        ConfigurationResponseModel value = params.get(key);
+        ConfigurationResponseModel value = cacheProvider.get(key);
         if (value != null) {
             if ("STRING".equalsIgnoreCase(value.getType())) {
                 return (T) value.getValue();
@@ -75,6 +86,7 @@ public class ConfigurationReader {
     @SuppressWarnings("unchecked")
     private void updateKeys() {
         try {
+            cacheProvider.clear();
             if (cookie.get() == null) {
                 establishConnection();
             }
@@ -90,7 +102,7 @@ public class ConfigurationReader {
                     try (InputStream inputStream = serviceConnection.getInputStream()) {
                         CollectionType valueType = objectMapper.getTypeFactory().constructCollectionType(List.class, ConfigurationResponseModel.class);
                         List<ConfigurationResponseModel> values = objectMapper.readValue(inputStream, valueType);
-                        values.forEach(model -> params.put(model.getName(), model));
+                        cacheProvider.put(values);
                     }
                     configurationPopulated.set(true);
                 } else if (responseCode == 401) {

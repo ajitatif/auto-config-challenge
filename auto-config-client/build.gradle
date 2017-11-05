@@ -1,20 +1,12 @@
-apply plugin: 'org.springframework.boot'
-apply plugin: "io.spring.dependency-management"
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.8.RELEASE")
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
-    }
+ext {
+    springVersion = "4.3.12.RELEASE"
 }
 
 dependencies {
 
+    compile("org.springframework:spring-context:${springVersion}")
     compile("com.fasterxml.jackson:jackson-datatype-json-org:1.8.0")
 
-    testCompile project(":auto-config-service")
+    testCompile("org.springframework:spring-test:${springVersion}")
 }
