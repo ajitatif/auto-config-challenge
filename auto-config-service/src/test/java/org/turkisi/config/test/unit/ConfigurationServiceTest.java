@@ -1,9 +1,11 @@
+package org.turkisi.config.test.unit;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.turkisi.config.ConfigurationAccessService;
-import org.turkisi.config.ConfigurationItemType;
-import org.turkisi.config.ConfigurationModel;
+import org.turkisi.config.service.ConfigurationAccessService;
+import org.turkisi.config.domain.ConfigurationItemType;
+import org.turkisi.config.domain.ConfigurationModel;
 import org.turkisi.config.repository.ConfigurationModelRepository;
 
 import java.util.ArrayList;

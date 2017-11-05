@@ -1,6 +1,8 @@
+package org.turkisi.config.test.unit;
+
 import org.junit.Test;
-import org.turkisi.config.ConfigurationItemType;
-import org.turkisi.config.ConfigurationModel;
+import org.turkisi.config.domain.ConfigurationItemType;
+import org.turkisi.config.domain.ConfigurationModel;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;

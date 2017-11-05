@@ -1,4 +1,4 @@
-package org.turkisi.config;
+package org.turkisi.config.domain;
 
 /**
  * @author Gökalp Gürbüzer (gokalp.gurbuzer@yandex.com)

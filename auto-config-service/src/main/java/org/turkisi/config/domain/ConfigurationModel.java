@@ -1,4 +1,4 @@
-package org.turkisi.config;
+package org.turkisi.config.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;

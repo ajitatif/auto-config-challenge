@@ -1,6 +1,7 @@
-package org.turkisi.config;
+package org.turkisi.config.service;
 
 import org.springframework.stereotype.Component;
+import org.turkisi.config.domain.ConfigurationModel;
 import org.turkisi.config.repository.ConfigurationModelRepository;
 
 /**

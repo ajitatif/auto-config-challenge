@@ -1,5 +1,7 @@
-import org.turkisi.config.ConfigurationItemType;
-import org.turkisi.config.ConfigurationModel;
+package org.turkisi.config.test.unit;
+
+import org.turkisi.config.domain.ConfigurationItemType;
+import org.turkisi.config.domain.ConfigurationModel;
 
 /**
  * @author Gökalp Gürbüzer (gokalp.gurbuzer@yandex.com)
