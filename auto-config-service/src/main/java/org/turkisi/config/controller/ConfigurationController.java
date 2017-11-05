@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.turkisi.config.domain.ConfigurationModel;
 import org.turkisi.config.error.KeyNotFoundException;
 import org.turkisi.config.error.SessionExpiredException;
 import org.turkisi.config.error.SessionNotFoundException;
@@ -16,6 +17,7 @@ import org.turkisi.config.security.SessionValidityStatus;
 import org.turkisi.config.service.ConfigurationAccessService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author Gökalp Gürbüzer (gokalp.gurbuzer@yandex.com)
@@ -40,10 +42,10 @@ public class ConfigurationController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{applicationName}/{key}", method = RequestMethod.GET)
-    public @ResponseBody <T> T getValue(HttpServletRequest request,
-                   @PathVariable("applicationName") String applicationName,
-                   @PathVariable("key") String key) throws KeyNotFoundException {
+    @RequestMapping(value = "/{applicationName}", method = RequestMethod.GET)
+    public @ResponseBody List<ConfigurationModel> getValue(
+                                    HttpServletRequest request,
+                                    @PathVariable("applicationName") String applicationName) throws KeyNotFoundException {
 
         SessionState sessionState = sessionStore.getSessionState(request.getSession().getId());
         if (sessionState == null || !sessionState.getApplicationName().equalsIgnoreCase(applicationName)) {
@@ -54,10 +56,16 @@ public class ConfigurationController {
             throw new SessionExpiredException("Session expired");
         }
 
-        T value = configurationAccessService.getValue(applicationName, key);
-        if (value == null) {
+        List<ConfigurationModel> values = configurationAccessService.getValuesForService(applicationName);
+        if (values == null || values.isEmpty()) {
             throw new KeyNotFoundException();
         }
-        return value;
+        values.forEach(value -> {
+            value.setApplicationName(null);
+            value.setId(null);
+            value.setActive(null);
+        });
+
+        return values;
     }
 }

@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import org.turkisi.config.domain.ConfigurationModel;
 import org.turkisi.config.repository.ConfigurationModelRepository;
 
+import java.util.List;
+
 /**
  * @author Gökalp Gürbüzer (gokalp.gurbuzer@yandex.com)
  */
@@ -16,23 +18,8 @@ public class ConfigurationAccessService {
         this.configurationModelRepository = configurationModelRepository;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getValue(String serviceName, String key) {
+    public List<ConfigurationModel> getValuesForService(String serviceName) {
 
-        ConfigurationModel config = configurationModelRepository.findByApplicationNameAndName(serviceName, key);
-        if (config != null) {
-
-            switch (config.getType()) {
-                case INT:
-                    return (T) Integer.valueOf(config.getValue());
-                case STRING:
-                    return (T) config.getValue();
-                case BOOLEAN:
-                    return (T) Boolean.valueOf(config.getValue());
-                default:
-                    break;
-            }
-        }
-        return null;
+        return configurationModelRepository.findByApplicationName(serviceName);
     }
 }

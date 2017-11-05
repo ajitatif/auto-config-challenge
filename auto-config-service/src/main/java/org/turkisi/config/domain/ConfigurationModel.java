@@ -1,5 +1,7 @@
 package org.turkisi.config.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -8,6 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "configuration")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigurationModel implements Serializable {
 
     private Long id;

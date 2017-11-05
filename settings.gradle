@@ -1,2 +1,3 @@
 include 'auto-config-service'
+include 'auto-config-client'
 
