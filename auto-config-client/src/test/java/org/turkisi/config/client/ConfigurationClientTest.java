@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("application-config.xml")
+@SuppressWarnings("unused")
 public class ConfigurationClientTest {
 
     @Autowired
@@ -24,30 +25,22 @@ public class ConfigurationClientTest {
     @Autowired
     private ConfigurationReader clientB;
 
-//    private volatile static boolean serviceInitialized = false;
-//
-//    @BeforeClass
-//    public static void startConfigurationService() {
-//
-//        Thread serviceStarterThread = new Thread(() -> ConfigurationServiceStarter.main(new String[0], (ServiceStateListener) () -> {
-//            serviceInitialized = true;
-//        }));
-//
-//        serviceStarterThread.start();
-//    }
+    @Autowired
+    private ConfigurationReader clientC;
 
     @Test
     public void testConfigurationClient() throws Exception {
 
-//        while (!serviceInitialized) {
-//            Thread.sleep(500);
-//
-//        }
         clientA.initialize("SERVICE-A", "http://localhost:8080", 5000);
         assertThat(clientA.getValue("SiteName"), equalTo("trendyol.com"));
         assertNull(clientA.getValue("MaxItemCount"));
 
         clientB.initialize("SERVICE-B", "http://localhost:8080", 5000);
         assertTrue(clientB.getValue("IsBasketEnabled"));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testUninitializedConfigurationClient() throws Exception {
+        clientC.getValue("ABCD");
     }
 }

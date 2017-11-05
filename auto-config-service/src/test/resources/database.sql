@@ -1,0 +1,26 @@
+INSERT INTO CONFIGURATION(ID, ACTIVE, APPLICATION_NAME, NAME, TYPE, VALUE)
+VALUES
+    (
+      nextval('HIBERNATE_SEQUENCE'),
+      true,
+      'SERVICE-A',
+      'SiteName',
+      'STRING',
+      'trendyol.com'
+    ),
+    (
+      nextval('HIBERNATE_SEQUENCE'),
+      true,
+      'SERVICE-B',
+      'IsBasketEnabled',
+      'BOOLEAN',
+      'true'
+    ),
+    (
+      nextval('HIBERNATE_SEQUENCE'),
+      false,
+      'SERVICE-A',
+      'MaxItemCount',
+      'INT',
+      '50'
+    );

@@ -23,13 +23,13 @@ import java.util.List;
  * @author Gökalp Gürbüzer (gokalp.gurbuzer@yandex.com)
  */
 @Controller
-@RequestMapping("/")
-public class ConfigurationController {
+@RequestMapping("/access")
+public class ConfigurationAccessController {
 
     private ConfigurationAccessService configurationAccessService;
     private SessionStore sessionStore;
 
-    public ConfigurationController(ConfigurationAccessService configurationAccessService, SessionStore sessionStore) {
+    public ConfigurationAccessController(ConfigurationAccessService configurationAccessService, SessionStore sessionStore) {
         this.configurationAccessService = configurationAccessService;
         this.sessionStore = sessionStore;
     }

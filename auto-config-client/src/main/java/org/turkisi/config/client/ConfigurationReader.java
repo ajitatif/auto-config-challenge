@@ -54,6 +54,9 @@ public class ConfigurationReader {
 
     @SuppressWarnings("unchecked")
     public <T> T getValue(String key) throws IOException {
+        if (serviceName == null) {
+            throw new IllegalStateException("Cannot get value before initialization. Call #initialize method first");
+        }
         for (int i = 0; i < 5; i++) {
             if (!configurationPopulated.get()) {
                 try {
@@ -139,6 +142,6 @@ public class ConfigurationReader {
     }
 
     private HttpURLConnection createConnection() throws IOException {
-        return (HttpURLConnection) URI.create(configurationServiceUrl + "/"+ serviceName).toURL().openConnection();
+        return (HttpURLConnection) URI.create(configurationServiceUrl + "/access/"+ serviceName).toURL().openConnection();
     }
 }
