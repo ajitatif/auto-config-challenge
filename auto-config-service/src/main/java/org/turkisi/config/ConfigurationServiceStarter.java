@@ -11,6 +11,10 @@ import org.turkisi.config.event.ServiceStateListener;
 @SpringBootApplication
 public class ConfigurationServiceStarter {
 
+    public static void main(String[] args) {
+        SpringApplication.run((ConfigurationServiceStarter.class), args);
+    }
+
     public static void main(String[] args, ServiceStateListener... listeners) {
         SpringApplication.run((ConfigurationServiceStarter.class), args).addApplicationListener(event -> {
             if (event instanceof ContextRefreshedEvent) {

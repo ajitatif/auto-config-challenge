@@ -1,3 +1,7 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'application'
@@ -21,4 +25,54 @@ dependencies {
     compile "org.hibernate:hibernate-core:5.2.5.Final"
     compile 'org.springframework.data:spring-data-jpa'
     compile "org.springframework.boot:spring-boot-starter-jdbc"
+}
+
+task dockerize(dependsOn: distZip, type: Copy) {
+    description "Builds a docker image from the application plugin output"
+    group "build"
+
+    def projectDefName = "${project.name}-${project.version}"
+    def zip = new File("${project.projectDir}/build/distributions/" + projectDefName + ".zip")
+    def zipExtractPath = "${project.rootDir}/docker/auto-config-service"
+
+    outputs.upToDateWhen { false }
+
+    from zipTree(zip)
+    include "**/*"
+    into zipExtractPath
+
+    doFirst {
+        Paths.get(zipExtractPath, projectDefName).toFile().deleteDir()
+        Paths.get(zipExtractPath, "bin").toFile().deleteDir()
+        Paths.get(zipExtractPath, "lib").toFile().deleteDir()
+    }
+
+    doLast {
+
+        def zipFinalPath = Paths.get("${zipExtractPath}/${projectDefName}/")
+        Files.list(zipFinalPath).forEach({
+            def zipExtractPathPath = Paths.get(zipExtractPath)
+            def relativePath = zipExtractPathPath.relativize(it)
+            if (relativePath.nameCount > 1) {
+                def movePath = Paths.get(relativePath.getName(1).toString())
+                for (int i = 2; i < relativePath.nameCount; i++) {
+                    movePath = Paths.get(movePath.toAbsolutePath().toString(), relativePath.getName(i).toString())
+                }
+                Files.move(it, zipExtractPathPath.resolve(movePath), StandardCopyOption.ATOMIC_MOVE)
+            }
+        })
+        Files.delete(zipFinalPath)
+
+
+        def process = new ProcessBuilder("docker build -t gokalpg/auto-config-service .".split())
+                .directory(new File(zipExtractPath))
+                .inheritIO().start()
+        process.inputStream.eachLine {
+            println it
+        }
+        process.waitFor()
+        if (process.exitValue() != 0) {
+            throw new GradleException("Docker exited with code ${process.exitValue()}")
+        }
+    }
 }
