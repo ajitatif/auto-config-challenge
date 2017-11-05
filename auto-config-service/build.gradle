@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'application'
+
+mainClassName = "org.turkisi.config.ConfigurationServiceStarter"
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.8.RELEASE")
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.data:spring-data-releasetrain:Hopper-SR5'
+    }
+}
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "com.h2database:h2:1.4.193"
+    compile "org.hibernate:hibernate-core:5.2.5.Final"
+    compile 'org.springframework.data:spring-data-jpa'
+    compile "org.springframework.boot:spring-boot-starter-jdbc"
+    compile "org.springframework.boot:spring-boot-starter-data-rest"
+}
