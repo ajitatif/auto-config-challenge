@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -111,6 +112,10 @@ public class ConfigurationReader {
                 } else if (responseCode == 401) {
                     cookie.set(null);
                     System.err.println("Session timed out, will try again on next update");
+                } else if (responseCode == 404) {
+                    System.err.println("No data for service" + serviceName + " (yet)");
+                    cacheProvider.put(new ArrayList<>());
+                    configurationPopulated.set(true);
                 }
             } finally {
                 if (serviceConnection != null) {
